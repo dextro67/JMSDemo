@@ -1,0 +1,51 @@
+
+Create a new queue
+
+[standalone@localhost:9990 /] jms-queue add --queue-address=myexample --entries=queue/myexample,java:/jms/queue/MyExampleQueue
+
+Change Expiry Scan Period
+[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default:write-attribute(name=message-expiry-scan-period,value=348348
+{
+    "outcome" => "success",
+    "response-headers" => {
+        "operation-requires-reload" => true,
+        "process-state" => "reload-required"
+    }
+}
+
+Change Redelivery Delay Interval for My queue. 
+
+[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default/address-setting=myexample:add(redelivery-delay=348348)
+{
+    "outcome" => "success",
+    "response-headers" => {
+        "operation-requires-reload" => true,
+        "process-state" => "reload-required"
+    }
+}
+
+[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default/address-setting=.myexample:write-attribute(name=expiry-address,value=jms.queue.ExpiryQueue
+
+[standalone@localhost:9990 /] /subsystem=messaging-activemq/server=default/address-setting=myexample:write-attribute(name=dead-letter-address,value=jms.queue.DLQ
+
+# Create an application user for connecting 
+
+$ ~/workspace/JMS/eap7.3_JMSdemo/bin/add-user.sh -a -u 'quickstartUser' -p 'quickstartPwd1!' -g 'guest'
+
+Config: 
+              <address-setting name="myexample" dead-letter-address="jms.queue.DLQ" expiry-address="jms.queue.ExpiryQueue" redelivery-delay="348348" max-delivery-attempts="3"/>
+....
+                              <jms-queue name="myexample" entries="queue/myexample java:jboss/exported/jms/queue/MyExampleQueue"/>
+
+
+JMS client output:
+Nov 04, 2020 12:34:47 PM org.jboss.as.quickstarts.jms.HelloWorldJMSClient main
+INFO: Found connection factory "jms/RemoteConnectionFactory" in JNDI
+Nov 04, 2020 12:34:47 PM org.jboss.as.quickstarts.jms.HelloWorldJMSClient main
+INFO: Attempting to acquire destination "jms/queue/MyExampleQueue"
+Nov 04, 2020 12:34:47 PM org.jboss.as.quickstarts.jms.HelloWorldJMSClient main
+INFO: Found destination "jms/queue/MyExampleQueue" in JNDI
+Nov 04, 2020 12:34:47 PM org.jboss.as.quickstarts.jms.HelloWorldJMSClient main
+INFO: Sending 1 messages with content: Hello, Abhishek!
+Nov 04, 2020 12:34:47 PM org.jboss.as.quickstarts.jms.HelloWorldJMSClient main
+INFO: Received message with content Hello, Abhishek!
